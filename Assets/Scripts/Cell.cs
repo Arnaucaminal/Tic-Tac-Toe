@@ -30,7 +30,7 @@ public class Cell : MonoBehaviour
 
     public void onClick()
     {
-        if (cube.activeSelf == true || sphere.activeSelf == true)
+        if (cube.activeSelf == true || sphere.activeSelf == true || gameManager.gameEnded == true)
         {
             return;
         }
@@ -52,4 +52,5 @@ public class Cell : MonoBehaviour
 
         gameManager.CheckWinner();
     }
+   
 }

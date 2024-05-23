@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public GameObject backToMenuButton;
     private bool modeAI;
     private bool thinking = false; // Variable per controlar si la IA està pensant
-    private bool gameEnded = false; // Variable per controlar si el joc ha acabat
+    public bool gameEnded = false; // Variable per controlar si el joc ha acabat
 
     public AudioClip clipWin;
     public AudioClip clipDraw;
@@ -77,11 +77,11 @@ public class GameManager : MonoBehaviour
     {
         if (status == CellType.SPHERE)
         {
-            label.text = "Sphere is the winner";
+            label.text = "Player is the winner";
         }
         else
         {
-            label.text = "Cube is the winner";
+            label.text = "AI is the winner";
         }
 
         SetupGameFinished(true);
@@ -96,12 +96,41 @@ public class GameManager : MonoBehaviour
 
     bool CheckWin(CellType player)
     {
+        // Revisar filas
+        for (int i = 0; i < 9; i += 3)
+        {
+            if (cells[i].status == player && cells[i + 1].status == player && cells[i + 2].status == player)
+            {
+                return true;
+            }
+        }
+        // Revisar columnas
+        for (int i = 0; i < 3; i++)
+        {
+            if (cells[i].status == player && cells[i + 3].status == player && cells[i + 6].status == player)
+            {
+                return true;
+            }
+        }
+        // Revisar diagonales
+        if ((cells[0].status == player && cells[4].status == player && cells[8].status == player) ||
+            (cells[2].status == player && cells[4].status == player && cells[6].status == player))
+        {
+            return true;
+        }
         return false;
     }
 
     bool CheckDraw()
     {
-        return false;
+        foreach (Cell cell in cells)
+        {
+            if (cell.status == CellType.EMPTY)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     void SetupGameFinished(bool winner)
@@ -127,11 +156,11 @@ public class GameManager : MonoBehaviour
         isCubeTurn = !isCubeTurn;
         if (isCubeTurn)
         {
-            label.text = "Cube's turn...";
+            label.text = "Ai Turn(Cube)";
         }
         else
         {
-            label.text = "Sphere's turn...";
+            label.text = "Player Turn(Sphere)";
         }
     }
 
@@ -195,6 +224,8 @@ public class GameManager : MonoBehaviour
     {
         thinking = true; // Marca que la IA està pensant
         int bestMove = GetBestMove();
+
+        
         if (bestMove >= 0 && bestMove < cells.Length && cells[bestMove].status == CellType.EMPTY)
         {
             cells[bestMove].onClick(); // La IA realitza la jugada
@@ -207,6 +238,7 @@ public class GameManager : MonoBehaviour
         if (modeAI && isCubeTurn && !thinking) // Només fa la jugada si és el torn de la IA i no està pensant
         {
             Invoke("MakeAIMoveWithDelay", 3.0f); // Espera 3 segons abans de cridar la funció de la IA
+            thinking = !thinking;
         }
     }
 
